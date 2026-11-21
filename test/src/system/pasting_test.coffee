@@ -101,6 +101,20 @@ testGroup "Pasting", template: "editor_empty", ->
         delete window.unsanitized
         done()
 
+  test "paste data-trix-attachment with serialized-attributes XSS", (done) ->
+    pasteData =
+      "text/plain": "x",
+      "text/html": "copy<div data-trix-attachment=\"{&quot;contentType&quot;:&quot;text/html&quot;,&quot;content&quot;:&quot;&lt;img src=\\&quot;x\\&quot; data-trix-serialized-attributes=\\&quot;{&amp;quot;onerror&amp;quot;:&amp;quot;alert(1)&amp;quot;}\\&quot;&gt;&quot;}\"></div>me"
+
+    pasteContent pasteData, ->
+      after 20, ->
+        div = document.createElement("div")
+        div.innerHTML = getEditorElement().value
+        img = div.querySelector("img")
+        assert.ok(img, "serialized HTML should contain an img element")
+        assert.notOk(img.hasAttribute("onerror"), "img should not have an onerror attribute")
+        done()
+
   test "prefers plain text when html lacks formatting", (expectDocument) ->
     pasteData =
       "text/html": "<meta charset='utf-8'>a\nb"

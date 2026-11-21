@@ -59,6 +59,10 @@ class Trix.HTMLSanitizer extends Trix.BasicObject
         element.removeAttribute("href")
 
     for {name} in [element.attributes...]
+      if name is "data-trix-serialized-attributes"
+        element.removeAttribute(name)
+        continue
+
       unless name in @allowedAttributes or name.indexOf("data-trix") is 0
         element.removeAttribute(name)
 
