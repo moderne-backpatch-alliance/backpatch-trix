@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 1.3.6-backpatch-00001
+baseline: v1.3.5+backpatch.baseline
+fixes:
+  - cve: CVE-2026-73426
+    upstream_fix_url: https://github.com/basecamp/trix/commit/3229c29c771ded4d247ed79b2ccd2cd05c4e74b4
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2026-73426
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-trix/compare/076f832~1...64191aa
+    basis: adapted
+    artifacts:
+      - trix
+    note: "New in this release; upstream's fix in 2.1.17 (3229c29, 53197ab), adapted to 1.3.5. It closes the advisory: Trix has a Stored XSS vulnerability through serialized attributes."
+tests:
+  commit: 64191aa4804af737716d3cde649522e7e397eaef
+  command: "build.rb (blade 0.7.3's build: Sprockets 3.6.0, Gemfile.lock gems, JRuby 9.3.15.0) writes dist/ with the banner year at 2024, npm pack --ignore-scripts; then the tested commit's test/ built with test/.blade.yml, test/dist/trix.js replaced by the package's dist/trix.js, karma start on headless Chromium (Node 16.20.2, the verify run's test/node_modules from yarn.lock), each test recorded into the JUnit report"
+  runtime: JRuby 9.3.15.0 on Java 11.0.20 (Zulu), Node.js v22.23.2 (ExecJS, npm 10.9.8), Node.js v16.20.2 with karma 5.0.2 and QUnit 2.9.3, Chrome Headless 140, macOS 27.2 arm64
+  report: trix-1.3.6-backpatch-00001-tests.zip
+  report_sha256: 8fc4306ebfa2e201ff8d7c3ae224cd3898a1fe6494f3730f1a4a27cd6f1b9c8c
+  result: pass
+  note: "upstream's karma suite (test/, QUnit on headless Chromium) with test/dist/trix.js taken from the packed package at the tested commit: 433 tests, 408 passed, 0 failed, 25 skipped. The CVE tests (test/src/system/pasting_test.coffee test/src/unit/html_sanitizer_test.coffee), with this release's production lines reverted at the tested commit: 3 tests, 1 passed, 2 failed, 0 skipped, test files exiting non-zero: test/dist/test.js; with them: 3 tests, 3 passed, 0 failed, 0 skipped. Built with blade's build (Sprockets on JRuby, banner year 2024) in a directory named trix, 3 of npmjs's 6 files for 1.3.5 are identical; the rest are dist/trix-core.js, dist/trix.js, package.json. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
